@@ -46,7 +46,8 @@ function getGcovParameters() {
 
 export async function isGcovCompatible() {
     const gcovBinary = getGcovBinary();
-    const command = `${gcovBinary} --help`;
+    const gcovParams = getGcovParameters();
+    const command = `${gcovBinary} ${gcovParams} --help`;
     return new Promise<boolean>((resolve, reject) => {
         child_process.exec(command, (err, stdout, stderr) => {
             if (err) {
