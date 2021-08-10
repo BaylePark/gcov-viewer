@@ -38,6 +38,12 @@ function getGcovBinary() {
     return gcovBinary;
 }
 
+function getGcovParameters() {
+    const config = vscode.workspace.getConfiguration('gcovViewer', null);
+    const gcovParams = config.get<string[]>('gcovExtraParams');
+    return gcovParams;
+}
+
 export async function isGcovCompatible() {
     const gcovBinary = getGcovBinary();
     const command = `${gcovBinary} --help`;
@@ -64,11 +70,13 @@ export async function loadGcovData(paths: string[]): Promise<GcovData[]> {
     }
 
     const gcovBinary = getGcovBinary();
+    const gcovParams = getGcovParameters();
 
-    let command = `${gcovBinary} --stdout --json-format`;
+    let command = `${gcovBinary} ${gcovParams} --stdout --json-format`;
     for (const path of paths) {
         command += ` "${path}"`;
     }
+    console.log(command);
     return new Promise<GcovData[]>((resolve, reject) => {
         child_process.exec(command, { maxBuffer: 256 * 1024 * 1024 }, (err, stdout, stderr) => {
             if (err) {
